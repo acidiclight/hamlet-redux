@@ -7,12 +7,22 @@ public class MathInstruction : ConversationInstruction
 {
     private string _variable;
     private int _delta;
+    private MathOperation _operation;
+    private string _variableToRead;
     
     private MathInstruction(ChatConversation context, string variableName, int delta) 
         : base(context)
     {
         _variable = variableName;
         _delta = delta;
+    }
+
+    private MathInstruction(ChatConversation context, string variable, MathOperation operation, string variableToRead)
+        : base(context)
+    {
+        _variable = variable;
+        _operation = operation;
+        _variableToRead = variableToRead;
     }
 
     public static ConversationInstruction ParseIncrement(ChatConversation context, string[] arguments)
@@ -56,6 +66,10 @@ public class MathInstruction : ConversationInstruction
         {
             return new MathInstruction(context, variable, value);
         }
+        else if (context.IsVariableDefined(valueString))
+        {
+            return new MathInstruction(context, variable, MathOperation.Add, valueString);
+        }
 
         throw new InvalidOperationException("Expected a numeric integer value in the add command.");
     }
@@ -75,6 +89,10 @@ public class MathInstruction : ConversationInstruction
         {
             return new MathInstruction(context, variable, -value);
         }
+        else if (context.IsVariableDefined(valueString))
+        {
+            return new MathInstruction(context, variable, MathOperation.Subtract, valueString);
+        }
 
         throw new InvalidOperationException("Expected a numeric integer value in the subtract command.");
     }
@@ -83,7 +101,40 @@ public class MathInstruction : ConversationInstruction
     public override IEnumerator PerformInstruction()
     {
         var value = Context.GetVariableValue(_variable);
-        Context.SetVariableValue(_variable, value + _delta);
+        if (string.IsNullOrWhiteSpace(_variableToRead))
+        {
+            Context.SetVariableValue(_variable, value + _delta);
+        }
+        else
+        {
+            var valueToApply = Context.GetVariableValue(_variableToRead);
+
+            switch (_operation)
+            {
+                case MathOperation.Add:
+                    Context.SetVariableValue(_variable, value + valueToApply);
+                    break;
+                case MathOperation.Subtract:
+                    Context.SetVariableValue(_variable, value - valueToApply);
+                    break;
+                case MathOperation.Multiply:
+                    Context.SetVariableValue(_variable, value * valueToApply);
+                    break;
+                case MathOperation.Divide:
+                    Context.SetVariableValue(_variable, value / valueToApply);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
         yield break;
+    }
+
+    public enum MathOperation
+    {
+        Add,
+        Subtract,
+        Multiply,
+        Divide
     }
 }

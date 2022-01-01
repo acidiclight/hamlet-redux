@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Text;
 using HamletRedux.Runtime;
 
 namespace HamletRedux.Instructions;
@@ -71,8 +72,10 @@ public class SayInstruction : ConversationInstruction
     
     public override IEnumerator PerformInstruction()
     {
+        var message = EvaluateMessageVariables(_message);
+        
         var typeText = $"@{_author.DisplayName} is typing...";
-        var typeDelay = 100 * _message.Length;
+        var typeDelay = 100 * message.Length;
         Console.Write(typeText);
         Thread.Sleep(typeDelay);
 
@@ -94,8 +97,54 @@ public class SayInstruction : ConversationInstruction
             yield return null;
         }
 
-        Console.WriteLine(_message);
+        Console.WriteLine(message);
+    }
 
+    private string EvaluateMessageVariables(string message)
+    {
+        var sb = new StringBuilder();
+        
+        var variableLeft = "${";
+        var variableRight = "}";
 
+        var i = 0;
+        while (i < message.Length)
+        {
+            var messageLeft = message.Substring(i);
+            var variableStart = messageLeft.IndexOf(variableLeft, StringComparison.Ordinal);
+            var variableEnd = messageLeft.IndexOf(variableRight, StringComparison.Ordinal);
+            
+            if (variableStart < 0 || variableEnd < 0)
+            {
+                sb.Append(messageLeft);
+                i = message.Length;
+            }
+            else
+            {
+                var toVariable = messageLeft.Substring(0, variableStart);
+                if (!string.IsNullOrEmpty(toVariable))
+                    sb.Append(toVariable);
+                i += toVariable.Length;
+
+                var variableNameStart = variableStart + variableLeft.Length;
+
+                var variableName = messageLeft.Substring(variableNameStart, variableEnd - variableNameStart);
+
+                i += variableLeft.Length + variableName.Length + variableRight.Length;
+
+                if (Context.IsVariableDefined(variableName))
+                {
+                    var value = Context.GetVariableValue(variableName);
+
+                    sb.Append(value.ToString());
+                }
+                else
+                {
+                    sb.Append("undefined");
+                }
+            }
+        }
+        
+        return sb.ToString();
     }
 }

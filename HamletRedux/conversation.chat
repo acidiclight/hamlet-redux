@@ -9,5 +9,7 @@
     possess player
     say "hello" to test
     
+    add accum dest
+    
     possess test
-    say "hello" to player
+    say "hello ${accum}${dest} test test test" to player
