@@ -29,6 +29,10 @@ public abstract class ConversationInstruction
         _parsers.Add("block", BlockInstruction.Parse);
         _parsers.Add("mission", MissionInstruction.Parse);
         _parsers.Add("clear_choices", ClearChoicesInstruction.Parse);
+        _parsers.Add("increment", MathInstruction.ParseIncrement);
+        _parsers.Add("decrement", MathInstruction.ParseDecrement);
+        _parsers.Add("add", MathInstruction.ParseAddition);
+        _parsers.Add("subtract", MathInstruction.ParseSubtraction);
     }
 
     public static ConversationInstruction CreateFromTokens(ChatConversation context, string type, string[] arguments)

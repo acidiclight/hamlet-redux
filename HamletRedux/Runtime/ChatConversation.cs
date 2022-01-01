@@ -30,6 +30,19 @@ public class ChatConversation
         _variables = new ConversationState(this);
     }
 
+    #region Variable Support
+
+    public bool IsVariableDefined(string name)
+        => _variables.IsDefined(name);
+
+    public int GetVariableValue(string name)
+        => _variables.GetValue(name);
+
+    public void SetVariableValue(string name, int value)
+        => _variables.SetValue(name, value);
+
+    #endregion
+    
     #region Chat Runner
 
     public void AddChoice(string message, ConversationInstruction action)
@@ -228,6 +241,13 @@ public class ChatConversation
         if (branches.All(x => x.Name != "main"))
             throw new InvalidOperationException("Chat conversation doesn't have a main branch.");
 
+        var stateList = branches.FirstOrDefault(x => x.Name == "state");
+        if (stateList != null)
+        {
+            branches = branches.Where(x => x.Name != "state").ToArray();
+            ProcessConversationState(stateList);
+        }
+        
         _parserBranchNames.AddRange(branches.Select(x=>x.Name));
 
         foreach (var branch in branches)
@@ -382,12 +402,6 @@ public class ChatConversation
     
     private void ProcessBranch(ConversationSection section)
     {
-        if (section.Name == "state")
-        {
-            ProcessConversationState(section);
-            return;
-        }
-        
         // Back up the online status of members.
         var online = _onlineIds.ToArray();
         
