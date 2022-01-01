@@ -103,6 +103,7 @@ public class ChatConversation
             {
                 case ConsoleKey.Enter:
                     hasChosen = true;
+                    _variables.SetValue("choice", choice);
                     yield return this.StartCoroutine(_choices[choice].RunChoice());
                     break;
                 case ConsoleKey.UpArrow:
@@ -247,6 +248,11 @@ public class ChatConversation
             branches = branches.Where(x => x.Name != "state").ToArray();
             ProcessConversationState(stateList);
         }
+        else
+        {
+            _variables.Clear();
+            SetImplicitVariables();
+        }
         
         _parserBranchNames.AddRange(branches.Select(x=>x.Name));
 
@@ -365,11 +371,19 @@ public class ChatConversation
         }
     }
 
+    private void SetImplicitVariables()
+    {
+        // Implicit variables.
+        _variables.SetValue("choice", 0); // Stores the last choice the player made.
+    }
+    
     private void ProcessConversationState(ConversationSection section)
     {
         // Clear any variables from previous conversations.
         _variables.Clear();
 
+        SetImplicitVariables();
+        
         foreach (var line in section.Actions)
         {
             // Find the assignment operator.

@@ -33,6 +33,7 @@ public abstract class ConversationInstruction
         _parsers.Add("decrement", MathInstruction.ParseDecrement);
         _parsers.Add("add", MathInstruction.ParseAddition);
         _parsers.Add("subtract", MathInstruction.ParseSubtraction);
+        _parsers.Add("do", DoInstruction.Parse);
     }
 
     public static ConversationInstruction CreateFromTokens(ChatConversation context, string type, string[] arguments)

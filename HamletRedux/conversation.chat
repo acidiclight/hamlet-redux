@@ -1,15 +1,20 @@
-﻿[members]
-    test=yes
-    
-[state]
-    accum=0
-    dest=5
-    
+﻿// Truth machine.
+
+[members]
+    creaturey=yes
+        
 [main]
+    possess creaturey
+    
+    say "What's your favorite number?" to player
+    
+    choice "0" goto truth_machine
+    choice "1" goto truth_machine
+    
+[truth_machine]
     possess player
-    say "hello" to test
+    do say "${choice}" to creaturey if choice=0
+    do say "${choice}" to creaturey until choice=0
+    clear_choices
     
-    add accum dest
     
-    possess test
-    say "hello ${accum}${dest} test test test" to player
