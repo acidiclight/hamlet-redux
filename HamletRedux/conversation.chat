@@ -1,0 +1,6 @@
+﻿[members]
+    test=yes
+    
+[main]
+    possess test
+    say "This is a test." to player
