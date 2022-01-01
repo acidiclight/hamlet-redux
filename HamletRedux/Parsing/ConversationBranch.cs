@@ -1,6 +1,9 @@
 ﻿using System.Collections;
+using HamletRedux.Instructions;
+using HamletRedux.Runtime;
+using HamletRedux.UnitedStatesOfWitchcraft;
 
-namespace HamletRedux;
+namespace HamletRedux.Parsing;
 
 public class ConversationBranch
 {

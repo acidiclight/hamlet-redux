@@ -1,7 +1,7 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using HamletRedux.Runtime;
 
-namespace HamletRedux;
+namespace HamletRedux.Instructions;
 
 public abstract class ConversationInstruction
 {

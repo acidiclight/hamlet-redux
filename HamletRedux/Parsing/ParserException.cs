@@ -1,4 +1,4 @@
-﻿namespace HamletRedux;
+﻿namespace HamletRedux.Parsing;
 
 public class ParserException : Exception
 {

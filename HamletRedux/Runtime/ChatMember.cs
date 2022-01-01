@@ -1,4 +1,4 @@
-﻿namespace HamletRedux;
+﻿namespace HamletRedux.Runtime;
 
 public class ChatMember
 {

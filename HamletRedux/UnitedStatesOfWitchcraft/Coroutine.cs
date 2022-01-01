@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 
+namespace HamletRedux.UnitedStatesOfWitchcraft;
+
 public class Coroutine
 {
     private IEnumerator _coroutine;

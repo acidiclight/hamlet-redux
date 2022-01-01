@@ -1,8 +1,9 @@
-﻿using System.Collections.Specialized;
-using System.Linq.Expressions;
-using System.Collections;
+﻿using System.Collections;
+using HamletRedux.Instructions;
+using HamletRedux.Parsing;
+using HamletRedux.UnitedStatesOfWitchcraft;
 
-namespace HamletRedux;
+namespace HamletRedux.Runtime;
 
 public class ChatConversation
 {
@@ -18,13 +19,15 @@ public class ChatConversation
     private bool _isChatActive = false;
     private ConversationBranch _currentBranch;
     private List<ChatChoice> _choices = new List<ChatChoice>();
-
+    private ConversationState _variables;
+    
     public string Name => _name;
     
     
     private ChatConversation(string name)
     {
         _name = name;
+        _variables = new ConversationState(this);
     }
 
     #region Chat Runner
@@ -162,7 +165,7 @@ public class ChatConversation
         else throw new InvalidOperationException("Cannot possess a member that's offline.");
     }
     
-        public static ChatConversation FromFile(string filePath)
+    public static ChatConversation FromFile(string filePath)
     {
         var conversation = new ChatConversation(Path.GetFileName(filePath));
 
@@ -342,8 +345,49 @@ public class ChatConversation
         }
     }
 
+    private void ProcessConversationState(ConversationSection section)
+    {
+        // Clear any variables from previous conversations.
+        _variables.Clear();
+
+        foreach (var line in section.Actions)
+        {
+            // Find the assignment operator.
+            var equalSign = line.IndexOf("=", StringComparison.Ordinal);
+
+            if (equalSign > 0)
+            {
+                var name = line.Substring(0, equalSign).Trim();
+                var valueString = line.Substring(equalSign + 1).Trim();
+
+                if (string.IsNullOrWhiteSpace(name))
+                    throw new ParserException(line, 0, "Expected a variable name.");
+
+                if (int.TryParse(valueString, out var value))
+                {
+                    _variables.SetValue(name, value);
+                }
+                else
+                {
+                    throw new ParserException(line, equalSign,
+                        "Expected numeric integer value for variable " + name + ".");
+                }
+            }
+            else
+            {
+                throw new ParserException(line, line.Length, "Expected state variable assignment.");
+            }
+        }
+    }
+    
     private void ProcessBranch(ConversationSection section)
     {
+        if (section.Name == "state")
+        {
+            ProcessConversationState(section);
+            return;
+        }
+        
         // Back up the online status of members.
         var online = _onlineIds.ToArray();
         
@@ -450,26 +494,5 @@ public class ChatConversation
         }
 
         return words.ToArray();
-    }
-}
-
-public class ChatChoice
-{
-    private string _message;
-    private ConversationInstruction _action;
-    private ChatConversation _context;
-
-    public ChatChoice(ChatConversation context, string message, ConversationInstruction instruction)
-    {
-        _context = context;
-        _message = message;
-        _action = instruction;
-    }
-
-    public string Text => _message;
-
-    public IEnumerator RunChoice()
-    {
-        yield return _context.StartCoroutine(_action.PerformInstruction());
     }
 }

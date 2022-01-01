@@ -1,6 +1,8 @@
 ﻿using System.Collections;
+using HamletRedux.Runtime;
+using HamletRedux.UnitedStatesOfWitchcraft;
 
-namespace HamletRedux;
+namespace HamletRedux.Instructions;
 
 public class GotoInstruction : ConversationInstruction
 {

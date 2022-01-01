@@ -1,6 +1,7 @@
 ﻿using System.Collections;
+using HamletRedux.Runtime;
 
-namespace HamletRedux;
+namespace HamletRedux.Instructions;
 
 public class InviteInstruction : ConversationInstruction
 {

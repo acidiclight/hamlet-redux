@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 
+namespace HamletRedux.UnitedStatesOfWitchcraft;
+
 public static class FakeCoroutineRunner
 {
     public static void FakeCoroutine(IEnumerator coroutine)

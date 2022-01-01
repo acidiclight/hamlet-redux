@@ -1,7 +1,7 @@
 ﻿using System.Collections;
-using System.Drawing;
+using HamletRedux.Runtime;
 
-namespace HamletRedux;
+namespace HamletRedux.Instructions;
 
 public class SayInstruction : ConversationInstruction
 {

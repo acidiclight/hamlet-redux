@@ -1,6 +1,13 @@
 ﻿[members]
     test=yes
     
+[state]
+    accum=0
+    dest=5
+    
 [main]
+    possess player
+    say "hello" to test
+    
     possess test
-    say "This is a test." to player
+    say "hello" to player
